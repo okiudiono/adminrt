@@ -1,0 +1,32 @@
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+$lang['required']           = 'Kolom {field} wajib diisi.';
+$lang['isset']              = 'Kolom {field} harus memiliki nilai.';
+$lang['valid_email']        = 'Kolom {field} harus berisi alamat email yang sah.';
+$lang['valid_emails']       = 'Kolom {field} harus berisi semua alamat email yang sah.';
+$lang['valid_url']          = 'Kolom {field} harus berisi URL yang sah.';
+$lang['valid_ip']           = 'Kolom {field} harus berisi IP yang sah.';
+$lang['min_length']         = 'Kolom {field} harus setidaknya {param} karakter.';
+$lang['max_length']         = 'Kolom {field} tidak boleh lebih dari {param} karakter.';
+$lang['exact_length']       = 'Kolom {field} harus tepat {param} karakter.';
+$lang['alpha']              = 'Kolom {field} hanya boleh berisi karakter alfabet.';
+$lang['alpha_numeric']      = 'Kolom {field} hanya boleh berisi karakter alfanumerik.';
+$lang['alpha_numeric_spaces'] = 'Kolom {field} hanya boleh berisi karakter alfanumerik dan spasi.';
+$lang['alpha_dash']         = 'Kolom {field} hanya boleh berisi karakter alfanumerik, underscore, dan tanda minus.';
+$lang['numeric']            = 'Kolom {field} harus berisi angka.';
+$lang['is_numeric']         = 'Kolom {field} harus berisi karakter numerik.';
+$lang['integer']            = 'Kolom {field} harus berisi integer.';
+$lang['regex_match']        = 'Kolom {field} tidak dalam format yang benar.';
+$lang['matches']            = 'Kolom {field} tidak cocok dengan kolom {param}.';
+$lang['differs']            = 'Kolom {field} harus berbeda dari kolom {param}.';
+$lang['is_unique']          = 'Kolom {field} harus berisi nilai yang unik.';
+$lang['is_natural']         = 'Kolom {field} hanya boleh berisi angka positif.';
+$lang['is_natural_no_zero'] = 'Kolom {field} harus berisi angka lebih besar dari nol.';
+$lang['decimal']            = 'Kolom {field} harus berisi angka desimal.';
+$lang['less_than']          = 'Kolom {field} harus berisi angka kurang dari {param}.';
+$lang['less_than_equal_to'] = 'Kolom {field} harus berisi angka kurang dari atau sama dengan {param}.';
+$lang['greater_than']       = 'Kolom {field} harus berisi angka lebih besar dari {param}.';
+$lang['greater_than_equal_to'] = 'Kolom {field} harus berisi angka lebih besar dari atau sama dengan {param}.';
+$lang['error_message_not_set'] = 'Tidak dapat mengakses pesan kesalahan yang sesuai dengan nama kolom {field}.';
+$lang['in_list']            = 'Kolom {field} harus salah satu dari: {param}.';

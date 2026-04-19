@@ -1,0 +1,35 @@
+networks:
+    webapp:
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    container_name: apidimas_front_nginx
+    ports:
+      - "4000:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/site.conf:/etc/nginx/conf.d/default.conf:rw
+      - ./docker/logs/nginx:/var/logs/nginx:rw
+    links:
+      - php
+    depends_on:
+      - php
+    networks:
+      - webapp
+
+  php:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    container_name: apidimas_front_php
+    volumes:
+        - ./:/var/www/html
+    ports:
+        - "9001:9001"
+    networks:
+        - webapp
+    # links:
+    #     - postgres 
+    # depends_on:
+    #     - postgres 
