@@ -5,8 +5,8 @@
     <title>Buku Jimpitan RT 004 RW 003 (Compact)</title>
     <style>
         @page {
-            size: landscape;
-            margin: 5mm;
+            size: legal landscape;
+            margin: 20mm 10mm 10mm 20mm; /* top, right, bottom, left */
         }
         body {
             font-family: Arial, sans-serif;
@@ -28,6 +28,8 @@
             margin: 1px 0; 
             font-size: 10px; 
             font-weight: bold;
+            text-align: left;
+            padding-left: 1mm;
         }
         .container-split {
             display: flex;
@@ -58,12 +60,12 @@
             padding-left: 3px;
             white-space: nowrap;
             font-weight: normal;
-            max-width: 70px;
+            max-width: 55px;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .date-col {
-            width: 12px;
+            width: 15px;
             font-size: 7px;
         }
         .total-col {
@@ -113,7 +115,12 @@
         }
         @media print {
             .no-print { display: none; }
-            body { margin: 0; }
+            body { 
+                margin: 0; 
+                padding-left: 10mm; /* Proteksi tambahan agar tidak terpotong di margin fisik printer */
+                padding-right: 5mm;
+                box-sizing: border-box;
+            }
             table { font-size: 9px; }
             tr:nth-child(even) td { background-color: #f9f9f9 !important; -webkit-print-color-adjust: exact; }
         }
@@ -131,7 +138,7 @@
 
     <div class="header">
         <h2>BUKU JIMPITAN RT 004 RW 003</h2>
-        <p>PERIODE: <?= $dates[0]['day'] . ' ' . strtoupper($bulan_list[$dates[0]['month']]) ?> - <?= end($dates)['day'] . ' ' . strtoupper($bulan_list[end($dates)['month']]) ?> <?= $tahun_pilih ?></p>
+        <p>PERIODE: ................................................................................................</p>
     </div>
 
     <?php

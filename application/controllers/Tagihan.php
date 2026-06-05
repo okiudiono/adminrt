@@ -3,10 +3,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Tagihan extends CI_Controller
 {
+	private $google_script_url = ''; // PASTE URL GOOGLE APPS SCRIPT ANDA DI SINI
+
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->database(); // Pastikan database dimuat
+		$this->load->database(); 
+		
+		// Anda bisa mengisi URL ini setelah melakukan deployment di Google Apps Script
+		$this->google_script_url = 'https://script.google.com/macros/s/AKfycbwmS8GoFYZJCp4gbaNV4ZU7hOl8o1Z2ORG4aGvyKcOqLyAzmA0XBr2raJLx0bWBOcOk/exec'; 
 	}
 
 	public function index()
@@ -276,15 +281,15 @@ class Tagihan extends CI_Controller
 		$this->load->view('tagihan/tagihan_list', $data);
 	}
 
-	public function cetak_semua()
+	public function cetak_semua($bulan = null, $tahun = null)
 	{
-		$bulan_sekarang = date('n'); // 1–12
-		$tahun_sekarang = date('Y');
+		$bulan_pilih = $bulan ?? date('n');
+		$tahun_pilih = $tahun ?? date('Y');
 		$data['tagihan'] = $this->db
-			->select('tagihan.*, warga.nama, warga.jk')
+			->select('tagihan.*, warga.nama, warga.jk, warga.status')
 			->join('warga', 'warga.id = tagihan.warga_id')
-			->where('tagihan.bulan', $bulan_sekarang)
-			->where('tagihan.tahun', $tahun_sekarang)
+			->where('tagihan.bulan', $bulan_pilih)
+			->where('tagihan.tahun', $tahun_pilih)
 			->order_by('tahun DESC, bulan DESC, warga.id ASC')
 			->get('tagihan')
 			->result();
@@ -292,7 +297,7 @@ class Tagihan extends CI_Controller
 		if (count($data['tagihan']) == 0) {
 			show_error('Data tagihan masih kosong');
 		}
-
+		$data['google_script_url'] = $this->google_script_url;
 		$this->load->view('tagihan/tagihan_cetak_4', $data);
 	}
 
@@ -534,5 +539,123 @@ class Tagihan extends CI_Controller
 			'Kas Umum', 'Kas Suran', 'Kas Swadaya', 'Pembangunan', 'TPQ'
 		];
 		$this->load->view('tagihan/kas', $data);
+	}
+
+	public function ronda()
+	{
+		// Ambil semua warga aktif, urutkan berdasarkan nama
+		$warga_aktif = $this->db
+			->where('aktif', true)
+			->order_by('nama', 'ASC')
+			->get('warga')
+			->result();
+
+		// Kelompokkan berdasarkan jadwal_ronda (1 - 7)
+		$jadwal = [];
+		for ($h = 1; $h <= 7; $h++) {
+			$jadwal[$h] = [];
+		}
+
+		foreach ($warga_aktif as $w) {
+			$hari = (int)$w->jadwal_ronda;
+			if ($hari >= 1 && $hari <= 7) {
+				$jadwal[$hari][] = $w;
+			}
+		}
+
+		$data['jadwal'] = $jadwal;
+		$data['hari_list'] = [
+			1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
+		];
+
+		$this->load->view('tagihan/ronda', $data);
+	}
+
+	public function ronda_harian($hari = null)
+	{
+		$hari_list = [
+			1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
+		];
+
+		if ($hari !== null) {
+			$hari = (int)$hari;
+			$target_hari = [$hari => $hari_list[$hari]];
+		} else {
+			$target_hari = $hari_list;
+		}
+
+		$jadwal_cetak = [];
+		foreach ($target_hari as $id => $nama) {
+			$jadwal_cetak[$id] = [
+				'nama' => $nama,
+				'warga' => $this->db
+					->where('aktif', true)
+					->where('jadwal_ronda', $id)
+					->order_by('nama', 'ASC')
+					->get('warga')
+					->result()
+			];
+		}
+
+		$data['jadwal_cetak'] = $jadwal_cetak;
+		$this->load->view('tagihan/ronda_harian', $data);
+	}
+
+	public function ronda_absen()
+	{
+		// Ambil semua warga aktif, urutkan berdasarkan nama
+		$warga_aktif = $this->db
+			->where('aktif', true)
+			->order_by('nama', 'ASC')
+			->get('warga')
+			->result();
+
+		// Kelompokkan berdasarkan jadwal_ronda (1 - 7)
+		$jadwal = [];
+		for ($h = 1; $h <= 7; $h++) {
+			$jadwal[$h] = [];
+		}
+
+		foreach ($warga_aktif as $w) {
+			$hari = (int)$w->jadwal_ronda;
+			if ($hari >= 1 && $hari <= 7) {
+				$jadwal[$hari][] = $w;
+			}
+		}
+
+		$data['jadwal'] = $jadwal;
+		$data['hari_list'] = [
+			1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
+		];
+
+		$this->load->view('tagihan/ronda_absen', $data);
+	}
+
+	public function ronda_qr()
+	{
+		$this->load->view('tagihan/ronda_qr');
+	}
+
+	public function ronda_scan()
+	{
+		// Deteksi hari ini (1=Senin, ..., 7=Minggu)
+		$hari_ini = date('N'); 
+		$hari_nama = [
+			1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
+		][$hari_ini];
+
+		// Ambil warga yang jadwalnya hari ini
+		$petugas_hari_ini = $this->db
+			->where('aktif', true)
+			->where('jadwal_ronda', $hari_ini)
+			->order_by('nama', 'ASC')
+			->get('warga')
+			->result();
+
+		$data['petugas'] = $petugas_hari_ini;
+		$data['hari_nama'] = $hari_nama;
+		$data['tanggal_ini'] = date('d-m-Y');
+
+		$this->load->view('tagihan/ronda_scan', $data);
 	}
 }
